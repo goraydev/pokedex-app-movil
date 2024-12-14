@@ -40,7 +40,6 @@ export const ThemeContextProvider = ({children}: PropsWithChildren) => {
     } else {
       setValueTheme(true);
     }
-    console.log(colorScheme);
   }, [colorScheme]);
 
   //setValueTheme(colorScheme === 'dark');

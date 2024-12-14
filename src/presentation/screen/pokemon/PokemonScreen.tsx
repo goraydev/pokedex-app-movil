@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import {RootStackParams} from '../../navigator/StackNavigator';
-import {Button, Chip, Text} from 'react-native-paper';
+import {Button, Chip, Surface, Text} from 'react-native-paper';
 import {useQuery} from '@tanstack/react-query';
 import {getPokemon} from '../../../actions/pokemons/get-pokemon';
 import {useContext, useEffect} from 'react';
@@ -18,6 +18,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {Formatter} from '../../../config/helpers/formatter';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ThemeContext} from '../../context/ThemeContext.';
+import {OrderMoveByLevel} from '../../../helpers/OrderMoveByLevel';
 
 export const PokemonScreen = () => {
   const {top} = useSafeAreaInsets();
@@ -92,6 +93,96 @@ export const PokemonScreen = () => {
         )}
       />
 
+      {/* GAMES */}
+      <Text
+        style={{
+          ...styles.pokemonName,
+          fontSize: 30,
+        }}>
+        Games
+      </Text>
+
+      <FlatList
+        data={pokemon.games}
+        horizontal
+        keyExtractor={item => item}
+        showsHorizontalScrollIndicator={false}
+        centerContent
+        style={{
+          marginBottom: 10,
+        }}
+        renderItem={item => <Chip style={{marginLeft: 10}}>{item.item}</Chip>}
+      />
+
+      {/* Abilites */}
+      <Text
+        style={{
+          ...styles.pokemonName,
+          fontSize: 30,
+        }}>
+        Abilities
+      </Text>
+
+      <FlatList
+        data={pokemon.abilities}
+        horizontal
+        keyExtractor={item => item}
+        showsHorizontalScrollIndicator={false}
+        centerContent
+        renderItem={item => (
+          <Text style={{padding: 10, fontSize: 15}}>{item.item}</Text>
+        )}
+      />
+
+      {/* stats */}
+      <Text
+        style={{
+          ...styles.pokemonName,
+          fontSize: 30,
+        }}>
+        Stats
+      </Text>
+
+      <FlatList
+        data={pokemon.stats}
+        horizontal
+        keyExtractor={item => item.name}
+        showsHorizontalScrollIndicator={false}
+        centerContent
+        style={{
+          marginBottom: 10,
+        }}
+        renderItem={item => (
+          <Chip style={{marginLeft: 10}}>
+            {item.item.name}: {item.item.value}
+          </Chip>
+        )}
+      />
+
+      <Text
+        style={{
+          ...styles.pokemonName,
+          fontSize: 30,
+        }}>
+        Move
+      </Text>
+
+      <FlatList
+        data={pokemon.move}
+        horizontal
+        keyExtractor={item => item.name}
+        showsHorizontalScrollIndicator={false}
+        centerContent
+        style={{
+          marginBottom: 10,
+        }}
+        renderItem={item => (
+          <Chip style={{marginLeft: 10}}>
+            {item.item.name}: {item.item.level}
+          </Chip>
+        )}
+      />
+
       <View style={{height: 100}} />
     </ScrollView>
   );
@@ -140,5 +231,12 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     marginHorizontal: 20,
     alignItems: 'center',
+  },
+  surface: {
+    padding: 8,
+    height: 80,
+    width: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
