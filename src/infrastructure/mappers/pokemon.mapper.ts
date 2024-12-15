@@ -16,11 +16,11 @@ export class PokemonMapper {
       types: data.types.map(type => type.type.name),
       color: color,
       games: data.game_indices.map(v => v.version.name),
+      abilities: data.abilities.map(abilitie => abilitie.ability.name),
       stats: data.stats.map(stat => ({
         name: stat.stat.name,
         value: stat.base_stat,
       })),
-      abilities: data.abilities.map(abilitie => abilitie.ability.name),
       move: data.moves
         .map(m => ({
           name: m.move.name,
