@@ -7,7 +7,11 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {RootStackParams} from '../../navigator/StackNavigator';
-import {getPokemons} from '../../../actions/pokemons';
+import {
+  getPokemonNamesWithId,
+  getPokemons,
+  getPokemonsByIds,
+} from '../../../actions/pokemons';
 import {
   useInfiniteQuery,
   useQuery,
@@ -15,14 +19,14 @@ import {
 } from '@tanstack/react-query';
 import {PokeballBg} from '../../components/ui/PokeballBg';
 import {useAnimation} from '../../hooks/useAnimation';
-import {useEffect, useState} from 'react';
-import {Button, Text, TextInput} from 'react-native-paper';
+import {useEffect, useMemo, useState} from 'react';
+import {Button, FAB, Text, TextInput} from 'react-native-paper';
 import {FlatList} from 'react-native-gesture-handler';
 import {globalTheme} from '../../../config/theme/global-theme';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {PokemonCard} from '../pokemon/PokemonCard';
 import {Pokemon} from '../../../domain/entities/pokemon';
-import {ShowFlatList} from '../search/SearchScreen';
+import {ShowFlatList} from '../search/ShowFlatList';
 
 export const HomeScreen = () => {
   const queryClient = useQueryClient();
@@ -48,29 +52,52 @@ export const HomeScreen = () => {
     queryFn: async params => {
       const pokemons = await getPokemons(params.pageParam);
 
+      console.log(params.pageParam);
       pokemons.forEach(pokemon => {
         queryClient.setQueryData(['pokemon', pokemon.id], pokemon);
       });
 
       return pokemons;
     },
+
     getNextPageParam: (lastPage, pages) => pages.length,
 
     staleTime: 1000 * 60 * 60,
   });
 
-  const handleSearch = () => {
-    const searched =
-      data?.pages
-        .flat()
-        .filter(pokemon =>
-          pokemon.name.toLowerCase().includes(text.toLowerCase()),
-        ) ?? [];
-    setLoadingSearch(true);
+  const {isLoading: loadingList, data: pokemonNameList = []} = useQuery({
+    queryKey: ['pokemon', 'all'],
+    queryFn: () => getPokemonNamesWithId(),
+  });
 
-    if (searched.length > 0) {
+  const pokemonNameIdList = useMemo(() => {
+    if (!isNaN(Number(text))) {
+      const pokemon = pokemonNameList.find(
+        (pokemon: {id: number}) => pokemon.id === Number(text),
+      );
+      return pokemon ? [pokemon] : [];
+    }
+
+    if (text.length === 0) return [];
+
+    if (text.length < 3) return [];
+
+    return pokemonNameList.filter(pokemon =>
+      pokemon.name.includes(text.toLocaleLowerCase()),
+    );
+  }, [text]);
+
+  const {isLoading: loadingData, data: pokemones = []} = useQuery({
+    queryKey: ['pokemons', 'by', pokemonNameIdList],
+    queryFn: () =>
+      getPokemonsByIds(pokemonNameIdList.map(pokemon => pokemon.id)),
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const handleSearch = () => {
+    if (pokemones.length > 0) {
       setLoadingSearch(false);
-      setPokemonSearch(searched);
+      setPokemonSearch(pokemones);
     }
   };
 
@@ -85,7 +112,7 @@ export const HomeScreen = () => {
   }, [text]);
 
   return (
-    <View style={[globalTheme.globalMargin, {top: top + 20, bottom: 200}]}>
+    <View style={[globalTheme.globalMargin, {top: top + 20}]}>
       <PokeballBg
         style={[
           styles.imgPositionTop,
@@ -125,6 +152,7 @@ export const HomeScreen = () => {
           Search
         </Button>
       </View>
+
       {/* 
       {pokemonSearch.length > 0 ? (
         <FlatList
@@ -168,7 +196,7 @@ export const HomeScreen = () => {
         <ShowFlatList
           pokemonSearch={pokemonSearch}
           headerText="Pokedex Encontrado"
-          onEndReached={() => fetchNextPage()}
+          onEndReached={null}
         />
       ) : !isLoading ? (
         <ShowFlatList
@@ -179,6 +207,12 @@ export const HomeScreen = () => {
       ) : (
         <ActivityIndicator />
       )}
+      <FAB
+        label="Buscar"
+        style={[styles.fab]}
+        mode="elevated"
+        onPress={() => navigation.navigate('search')}
+      />
     </View>
   );
 };
@@ -193,5 +227,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 600,
     left: -100,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 100,
+    right: 20,
   },
 });
