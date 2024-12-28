@@ -13,10 +13,12 @@ import {PokemonCard} from '../pokemon/PokemonCard';
 import {Pokemon} from '../../../domain/entities/pokemon';
 import {View} from 'react-native';
 import {FullScreenLoader} from '../../components/ui/FullScreenLoader';
+import {useDebounceValue} from '../../hooks/useDebouncedValue';
 
 export const SearchSecondScreen = () => {
   const [text, setText] = useState('');
   const {top} = useSafeAreaInsets();
+  const debounceValue = useDebounceValue(text);
 
   const {isLoading, data: pokemonNameList = []} = useQuery({
     queryKey: ['pokemon', 'all'],
@@ -24,21 +26,21 @@ export const SearchSecondScreen = () => {
   });
 
   const pokemonNameIdList = useMemo(() => {
-    if (!isNaN(Number(text))) {
+    if (!isNaN(Number(debounceValue))) {
       const pokemon = pokemonNameList.find(
-        (pokemon: {id: number}) => pokemon.id === Number(text),
+        (pokemon: {id: number}) => pokemon.id === Number(debounceValue),
       );
       return pokemon ? [pokemon] : [];
     }
 
-    if (text.length === 0) return [];
+    if (debounceValue.length === 0) return [];
 
-    if (text.length < 3) return [];
+    if (debounceValue.length < 3) return [];
 
     return pokemonNameList.filter(pokemon =>
-      pokemon.name.includes(text.toLocaleLowerCase()),
+      pokemon.name.includes(debounceValue.toLocaleLowerCase()),
     );
-  }, [text]);
+  }, [debounceValue]);
 
   const {isLoading: loadingData, data: pokemones} = useQuery({
     queryKey: ['pokemons', 'by', pokemonNameIdList],

@@ -153,45 +153,6 @@ export const HomeScreen = () => {
         </Button>
       </View>
 
-      {/* 
-      {pokemonSearch.length > 0 ? (
-        <FlatList
-          data={pokemonSearch}
-          keyExtractor={pokemon => `${pokemon.id}`}
-          numColumns={2}
-          renderItem={item => <PokemonCard pokemon={item.item} />}
-          ListHeaderComponent={() => (
-            <Text variant="displayMedium" style={{marginBottom: 50}}>
-              Pokédex Encontrado
-            </Text>
-          )}
-          style={{elevation: 20}}
-          onEndReachedThreshold={0.6}
-          showsVerticalScrollIndicator={false}
-        />
-      ) : !isLoading ? (
-        <FlatList
-          data={data?.pages.flat() ?? []}
-          keyExtractor={pokemon => `${pokemon.id}`}
-          numColumns={2}
-          renderItem={item => <PokemonCard pokemon={item.item} />}
-          ListHeaderComponent={() => (
-            <Text variant="displayMedium" style={{marginBottom: 50}}>
-              Pokédex
-            </Text>
-          )}
-          style={{elevation: 20}}
-          onEndReached={() => fetchNextPage()}
-          onEndReachedThreshold={0.6}
-          showsVerticalScrollIndicator={false}
-          ListFooterComponent={() => (
-            <ActivityIndicator size="large" color={'white'} />
-          )}
-        />
-      ) : (
-        <ActivityIndicator />
-      )} */}
-
       {pokemonSearch.length > 0 && text.length > 0 ? (
         <ShowFlatList
           pokemonSearch={pokemonSearch}
