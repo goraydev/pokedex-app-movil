@@ -18,7 +18,7 @@ import {useDebounceValue} from '../../hooks/useDebouncedValue';
 export const SearchSecondScreen = () => {
   const [text, setText] = useState('');
   const {top} = useSafeAreaInsets();
-  const debounceValue = useDebounceValue(text);
+  const debounceValue = useDebounceValue(text, 1000);
 
   const {isLoading, data: pokemonNameList = []} = useQuery({
     queryKey: ['pokemon', 'all'],
